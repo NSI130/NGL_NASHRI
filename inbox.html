@@ -1,76 +1,67 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Inbox Pesan</title>
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
-    h1 { text-align: center; }
-    .item { border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-    .time { font-size: 12px; color: #666; margin-top: 6px; }
-    .controls { display: flex; gap: 8px; margin: 12px 0; }
-    input, button { padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; }
-    button { cursor: pointer; }
-  </style>
-</head>
-<body>
-  <h1>📬 Inbox Pesan</h1>
-  <div class="controls">
-    <input id="username" placeholder="to= siapa? (misal: nashri)" />
-    <button id="load">Muat Pesan</button>
-  </div>
-  <div id="list"></div>
-
+  <meta charset="UTF-8">
+  <title>Inbox Admin</title>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
+    // Konfigurasi Firebase lo
     const firebaseConfig = {
-      apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
-      authDomain: "nashri-ngl.firebaseapp.com",
-      databaseURL: "https://nashri-ngl-default-rtdb.firebaseio.com",
-      projectId: "nashri-ngl",
-      storageBucket: "nashri-ngl.firebasestorage.app",
-      messagingSenderId: "73245598906",
-      appId: "1:73245598906:web:70b18cb9ccf9e54ff18e83",
-      measurementId: "G-FWSDBGGXGH"
+      apiKey: "API_KEY_LO",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://PROJECT_ID.firebaseio.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    const list = document.getElementById("list");
-    const usernameInput = document.getElementById("username");
-    document.getElementById("load").addEventListener("click", () => {
-      const user = (usernameInput.value || "public").trim();
-      const q = query(ref(db, `messages/${user}`), orderByChild("timestamp"), limitToLast(200));
+    // Tombol login
+    async function login() {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert("Login gagal: " + err.message);
+      }
+    }
 
-      onValue(q, (snap) => {
-        const arr = [];
-        snap.forEach(child => {
-          arr.push(child.val());
-        });
-        arr.sort((a,b) => b.timestamp - a.timestamp); // terbaru dulu
-        list.innerHTML = "";
-        if (arr.length === 0) {
-          list.innerHTML = "<p>Belum ada pesan.</p>";
-          return;
-        }
-        for (const m of arr) {
-          const div = document.createElement("div");
-          const t = new Date(m.timestamp || Date.now());
-          div.className = "item";
-          div.innerHTML = `
-            <div>${(m.text || "").replaceAll("<","&lt;")}</div>
-            <div class="time">${t.toLocaleString()}</div>
-          `;
-          list.appendChild(div);
-        }
-      }, (err) => {
-        list.innerHTML = "<p>Gagal baca: " + err.message + "</p>";
-      });
+    // Cek user login
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.uid === "6dAPpFNrYeQp2SpoXuRS3LGCJL33") {
+        document.getElementById("status").innerText = "Login sukses ✅";
+        loadMessages();
+      } else if (user) {
+        alert("Bukan admin bro! 🚫");
+        auth.signOut();
+      }
     });
+
+    // Baca pesan
+    function loadMessages() {
+      const list = document.getElementById("messages");
+      onChildAdded(ref(db, "messages/public"), (snap) => {
+        const data = snap.val();
+        const li = document.createElement("li");
+        li.textContent = `${new Date(data.timestamp).toLocaleString()} → ${data.text}`;
+        list.appendChild(li);
+      });
+    }
+
+    window.login = login;
   </script>
+</head>
+<body>
+  <h2>📩 Inbox Pesan Anonim</h2>
+  <button onclick="login()">Login Admin</button>
+  <p id="status">Belum login</p>
+  <ul id="messages"></ul>
 </body>
 </html>
