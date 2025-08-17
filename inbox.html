@@ -23,18 +23,42 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     width: 100%;
     max-width: 500px;
+    text-align: center;
   }
 
   h1 {
-    text-align: center;
     margin-bottom: 15px;
     color: #111;
   }
 
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    background: #111;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px 0;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+
+  button:active { transform: scale(0.97); }
+
   #status {
     font-size: 14px;
     margin-bottom: 15px;
-    text-align: center;
+    color: #555;
   }
 
   #messages {
@@ -43,6 +67,7 @@
     max-height: 400px;
     overflow-y: auto;
     border-top: 1px solid #eee;
+    text-align: left;
   }
 
   #messages li {
@@ -51,9 +76,7 @@
     transition: background 0.3s ease;
   }
 
-  #messages li:hover {
-    background: #f9f9f9;
-  }
+  #messages li:hover { background: #f9f9f9; }
 
   .timestamp {
     font-size: 11px;
@@ -66,14 +89,20 @@
 <body>
 
 <div class="card">
-  <h1>📩 Inbox Pesan Anonim</h1>
-  <p id="status">Memuat pesan...</p>
+  <h1>📩 Inbox Admin</h1>
+  <div id="loginForm">
+    <input type="email" id="email" placeholder="Email admin">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
+  </div>
+  <p id="status">Belum login</p>
   <ul id="messages"></ul>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 // ====== GANTI INI DENGAN CONFIG ASLI LO ======
 const firebaseConfig = {
@@ -88,24 +117,50 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
-const messagesList = document.getElementById("messages");
+const loginBtn = document.getElementById("loginBtn");
+const emailEl = document.getElementById("email");
+const passwordEl = document.getElementById("password");
 const statusEl = document.getElementById("status");
+const messagesList = document.getElementById("messages");
+const loginForm = document.getElementById("loginForm");
+
+loginBtn.addEventListener("click", async () => {
+  const email = emailEl.value.trim();
+  const password = passwordEl.value.trim();
+  if(!email || !password) {
+    statusEl.textContent = "Isi email & password bro!";
+    return;
+  }
+
+  statusEl.textContent = "Login...";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(err) {
+    statusEl.textContent = "Login gagal: " + err.message;
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if(user) {
+    statusEl.textContent = "Login sukses ✅";
+    loginForm.style.display = "none";
+    loadMessages();
+  }
+});
 
 function loadMessages() {
   const messagesRef = ref(db, "messages/public");
-
   onChildAdded(messagesRef, (snapshot) => {
     const data = snapshot.val();
     const li = document.createElement("li");
     li.innerHTML = `${data.text}<span class="timestamp">${new Date(data.timestamp).toLocaleString()}</span>`;
     messagesList.prepend(li);
-
-    statusEl.textContent = "✅ Pesan berhasil dimuat";
+    statusEl.textContent = "✅ Pesan dimuat";
   });
 }
-
-loadMessages();
 </script>
 
 </body>
