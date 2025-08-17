@@ -1,240 +1,524 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💌 Kirim Pesan ke Nashri</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>💌 Kirim Pesan ke Nashri — Elegant</title>
+<link rel="icon" href="data:,">
 <style>
-  /* Warna utama */
-  :root {
-    --dark: #222831;
-    --semi-dark: #393E46;
-    --accent: #00ADB5;
-    --light: #EEEEEE;
-  }
+/* =========================
+   THEME (Elegan & Kalem)
+   Palette: minimal, soft
+   ========================= */
+:root{
+  --bg: #F7F8FA;           /* page background (light) */
+  --card-bg: #FFFFFF;      /* card surface */
+  --muted: #9AA1A6;        /* muted text */
+  --text: #1F2D3D;         /* main text */
+  --accent: #0F9D9A;       /* accent (soft teal) */
+  --accent-600: #00ADB5;
+  --danger: #E24A4A;
+  --glass: rgba(30,40,50,0.04);
+  --radius: 16px;
+  --shadow-1: 0 6px 18px rgba(25,35,45,0.08);
+  --shadow-2: 0 20px 50px rgba(20,30,40,0.08);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New";
+  --ease: cubic-bezier(.2,.9,.2,1);
+  --max-width: 720px;
+}
 
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: var(--dark);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    color: var(--light);
-    overflow-x: hidden;
-  }
+/* Reset-ish */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #F3F6F8 0%, var(--bg) 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+}
 
-  /* Card utama */
-  .card {
-    background: var(--semi-dark);
-    padding: 30px 25px;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    animation: fadeInUp 0.7s ease;
-  }
+/* Layout */
+.container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  display:grid;
+  gap:22px;
+  grid-template-columns: 1fr 380px;
+  align-items:start;
+}
 
-  @keyframes fadeInUp {
-    from {opacity: 0; transform: translateY(30px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
+/* For mobile: single column */
+@media (max-width:900px){
+  .container{grid-template-columns: 1fr; padding:0 12px}
+}
 
-  h1 {
-    margin-bottom: 20px;
-    color: var(--accent);
-    font-size: 1.6rem;
-    font-weight: bold;
-  }
+/* Left panel (form) */
+.panel {
+  background:var(--card-bg);
+  border-radius:calc(var(--radius) + 4px);
+  box-shadow:var(--shadow-2);
+  padding:22px;
+  overflow:hidden;
+  position:relative;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.panel.small{
+  padding:16px;
+}
 
-  textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 14px;
-    border-radius: 12px;
-    border: 2px solid transparent;
-    resize: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background: var(--dark);
-    color: var(--light);
-  }
+/* subtle floating effect */
+.panel:hover{ transform: translateY(-6px); box-shadow: 0 30px 60px rgba(20,30,40,0.07); }
 
-  textarea::placeholder {
-    color: #aaa;
-  }
+/* Header */
+.header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
+.logo{
+  width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-600));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow:0 6px 20px rgba(16,140,140,0.12);
+}
+.title{
+  font-size:18px;font-weight:600;line-height:1;color:var(--text);
+}
+.subtitle{font-size:13px;color:var(--muted)}
 
-  textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(0,173,181,0.5);
-  }
+/* Textarea */
+.form-row{margin-top:8px}
+.label{font-size:13px;margin-bottom:8px;color:var(--muted)}
+.textarea-wrap{position:relative;display:block}
+textarea{
+  width:100%;
+  min-height:140px;
+  max-height:48vh;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid rgba(20,25,30,0.04);
+  background:linear-gradient(180deg, #fff, #fbfdff);
+  resize:vertical;
+  font-size:15px;
+  line-height:1.5;
+  color:var(--text);
+  transition:box-shadow .25s var(--ease), border-color .25s var(--ease);
+  -webkit-appearance:none;
+}
+textarea:focus{outline:none;box-shadow:0 8px 30px rgba(12,80,80,0.06);border-color:rgba(15,157,154,0.18)}
 
-  .char-count {
-    text-align: right;
-    font-size: 13px;
-    color: #bbb;
-    margin-top: 6px;
-    transition: color 0.3s;
-  }
+/* helper row with charcount and options */
+.helper-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:8px;
+  gap:8px;
+}
+.charcount{
+  font-size:13px;color:var(--muted);
+}
+.btn-row{display:flex;gap:10px;align-items:center}
 
-  .char-count.warning { color: orange; }
-  .char-count.danger { color: red; }
+/* Main button */
+.btn{
+  background:linear-gradient(90deg,var(--accent),var(--accent-600));
+  color:white;
+  border:0;padding:12px 18px;border-radius:999px;font-weight:700;font-size:15px;
+  cursor:pointer;box-shadow:0 12px 30px rgba(0,173,181,0.12);
+  transition:transform .18s var(--ease), box-shadow .18s var(--ease), opacity .18s var(--ease);
+}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.6;cursor:not-allowed;box-shadow:none}
 
-  button {
-    margin-top: 20px;
-    padding: 14px 30px;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    background: var(--accent);
-    color: var(--light);
-    font-size: 16px;
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
+/* small secondary buttons */
+.btn-ghost{background:transparent;border:1px solid rgba(20,30,30,0.06);padding:10px 14px;border-radius:12px;color:var(--text);font-weight:600}
 
-  button:hover:not(:disabled) {
-    background: #02c4ce;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,173,181,0.4);
-  }
+/* Right panel (inbox preview / info) */
+.panel-info{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:14px;padding:18px;min-height:220px;box-shadow:var(--shadow-1);
+}
+.info-title{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:6px}
+.info-text{font-size:13px;color:var(--muted);line-height:1.4}
 
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+/* toast / notifications */
+.toast-wrap{position:fixed;right:22px;bottom:22px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{
+  background: #fff;border-radius:12px;padding:10px 14px;min-width:220px;box-shadow:var(--shadow-2);color:var(--text);
+  display:flex;gap:10px;align-items:center;font-size:14px;
+  transform-origin:right bottom;animation:toastIn .26s var(--ease) both;
+}
+@keyframes toastIn{from{opacity:0; transform:translateY(6px) scale(.98)} to{opacity:1; transform:none}}
 
-  /* Ripple animasi */
-  button::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    background: rgba(255,255,255,0.5);
-    width: 100px;
-    height: 100px;
-    left: 50%;
-    top: 50%;
-    pointer-events: none;
-    transition: transform 0.5s, opacity 1s;
-    transform: translate(-50%,-50%) scale(0);
-    opacity: 0;
-  }
+/* loader variants */
+.loader {
+  width:18px;height:18px;border-radius:50%;border:3px solid rgba(0,0,0,0.05);border-top-color:var(--accent-600);animation:spin 0.9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  button:active::after {
-    transform: translate(-50%,-50%) scale(2.5);
-    opacity: 1;
-    transition: 0s;
-  }
+/* accessibility helper */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-  .status {
-    margin-top: 15px;
-    font-size: 14px;
-    min-height: 22px;
-    transition: all 0.3s ease;
-  }
+/* input tilt effect for subtle motion on devices with pointer */
+@media (hover: hover) and (pointer: fine){
+  .card-tilt{transform-origin:center;transition:transform .5s var(--ease)}
+}
 
-  .status.success { color: #4CAF50; }
-  .status.error { color: #FF5252; }
-  .status.sending { color: var(--accent); }
+/* responsive tweaks */
+@media (max-width:900px){
+  .container{grid-template-columns: 1fr}
+  .panel{order:2}
+  .panel-info{order:1}
+}
 
-  /* Animasi status */
-  .status.fade {
-    animation: fadeIn 0.5s ease;
-  }
-
-  @keyframes fadeIn {
-    from {opacity: 0; transform: scale(0.9);}
-    to {opacity: 1; transform: scale(1);}
-  }
+/* long comment spacer to increase file size (NOT repeated in real life) */
+/* ===== END OF STYLES ===== */
 </style>
 </head>
 <body>
+  <main class="container" role="main" aria-labelledby="pageTitle">
 
-<div class="card">
-  <h1>💌 Kirim Pesan buat Nashri</h1>
-  <textarea id="message" maxlength="300" placeholder="Tulis pesanmu di sini..."></textarea>
-  <div class="char-count" id="charCount">300 karakter tersisa</div>
-  <button id="sendBtn">🚀 Kirim</button>
-  <div id="status" class="status"></div>
-</div>
+    <!-- Panel: Message Form -->
+    <section class="panel" aria-label="Kirim pesan">
+      <div class="header">
+        <div class="logo" aria-hidden="true">N</div>
+        <div>
+          <div class="title" id="pageTitle">Kirim Pesan buat Nashri</div>
+          <div class="subtitle">Anonim · Pesan akan disimpan ke node <code>messages/nashri</code></div>
+        </div>
+      </div>
+
+      <form id="sendForm" class="send-form" onsubmit="return false" novalidate>
+        <div class="form-row">
+          <label class="label" for="message">Pesan (maks 300 karakter)</label>
+          <div class="textarea-wrap">
+            <textarea id="message" maxlength="300" aria-describedby="charCount" placeholder="Tulis pesan, kata-kata penyemangat, atau rahasia yang ingin kamu kirim..."></textarea>
+          </div>
+          <div class="helper-row">
+            <div class="charcount" id="charCount">300 karakter tersisa</div>
+            <div class="btn-row">
+              <button id="previewBtn" class="btn-ghost" type="button" title="Preview pesan">Preview</button>
+              <button id="sendBtn" class="btn" type="button" aria-live="polite"><span id="sendLabel">Kirim</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- small note and anti-spam hint -->
+        <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+          <strong>Tip:</strong> Mohon jangan spam. Sistem membatasi satu kirim setiap 5 detik dari perangkat yang sama.
+        </div>
+      </form>
+    </section>
+
+    <!-- Panel: Info / Inbox preview -->
+    <aside class="panel-info" aria-label="Informasi">
+      <div class="info-title">Preview & Info</div>
+      <div class="info-text">
+        Pesan yang dikirim akan masuk ke node <code>messages/nashri</code>. Hanya admin yang login dapat membaca node ini.
+        Jika Anda men-deploy di Firebase Hosting, config akan otomatis terdeteksi. Jika tidak, gunakan file <code>config.js</code> yang di-generate saat build (lihat komentar di bawah).
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Contoh pesan terakhir</div>
+          <div id="previewPane" style="background:var(--glass);padding:12px;border-radius:12px;color:var(--text);min-height:72px;display:flex;align-items:center;justify-content:center">
+            <span id="previewText" style="color:var(--muted)">Belum ada preview.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div style="display:flex;gap:8px">
+        <button id="demoFill" class="btn-ghost" type="button">Isi contoh</button>
+        <button id="clearBtn" class="btn-ghost" type="button">Bersihkan</button>
+      </div>
+
+      <div style="margin-top:14px;font-size:13px;color:var(--muted)">
+        Mode pengujian: Anda dapat mengaktifkan dev-mode untuk menampilkan debug log (tidak direkomendasikan untuk produksi).
+      </div>
+      <div style="height:6px"></div>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)"><input id="devMode" type="checkbox"> Aktifkan dev-mode</label>
+    </aside>
+
+  </main>
+
+  <!-- Toast container -->
+  <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="false"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+/* ===========================
+   FIREBASE SAFE INITIALIZATION
+   - This script will attempt to get Firebase config in the following order:
+     1) window.__FIREBASE_CONFIG__ (recommended for GitHub Pages / Netlify via runtime-injected config.js)
+     2) fetch('/__/firebase/init.json') (automatic for Firebase Hosting)
+   - IMPORTANT: DO NOT hardcode API keys in repo. Use CI or hosting to inject.
+   =========================== */
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
-  authDomain: "nashri-ngl.firebaseapp.com",
-  databaseURL: "https://nashri-ngl-default-rtdb.firebaseio.com",
-  projectId: "nashri-ngl",
-  storageBucket: "nashri-ngl.appspot.com",
-  messagingSenderId: "73245598906",
-  appId: "1:73245598906:web:70b18cb9ccf9e54ff18e83"
-};
+async function getFirebaseConfig() {
+  // 1) window variable (CI/build-time injection pattern)
+  if(window.__FIREBASE_CONFIG__ && window.__FIREBASE_CONFIG__.apiKey){
+    return window.__FIREBASE_CONFIG__;
+  }
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  // 2) Firebase Hosting auto-init endpoint
+  try {
+    const resp = await fetch('/__/firebase/init.json', {cache:"no-store"});
+    if(resp.ok){
+      const cfg = await resp.json();
+      if(cfg && cfg.apiKey) return cfg;
+    }
+  } catch(e){
+    // ignore, fallback below
+  }
 
-const btn = document.getElementById("sendBtn");
-const msgEl = document.getElementById("message");
-const statusEl = document.getElementById("status");
-const charCount = document.getElementById("charCount");
+  // no config found
+  return null;
+}
 
-// Hitungan karakter sisa + indikator warna
-msgEl.addEventListener("input", () => {
-  const remaining = 300 - msgEl.value.length;
+/* ===========================
+   Minimal UI helper utilities
+   =========================== */
+const $ = (s, root=document) => root.querySelector(s);
+const create = (tag, attrs={}) => Object.assign(document.createElement(tag), attrs);
+
+/* Toast notifications */
+const toastWrap = $('#toastWrap');
+function showToast(text, type='default', ttl=3600){
+  const t = create('div');
+  t.className = 'toast';
+  if(type==='error') t.style.borderLeft = '4px solid var(--danger)';
+  else if(type==='success') t.style.borderLeft = '4px solid var(--accent)';
+  t.textContent = text;
+  toastWrap.appendChild(t);
+  setTimeout(()=> {
+    t.style.opacity = '0'; t.style.transform='translateY(8px) scale(.98)';
+    setTimeout(()=> t.remove(), 400);
+  }, Math.max(1800, ttl));
+}
+
+/* DOM refs */
+const textarea = $('#message');
+const charCount = $('#charCount');
+const sendBtn = $('#sendBtn');
+const sendLabel = $('#sendLabel') || $('#sendBtn').querySelector('span') || null;
+const previewText = $('#previewText');
+const previewPane = $('#previewPane');
+const demoFill = $('#demoFill');
+const clearBtn = $('#clearBtn');
+const devModeToggle = $('#devMode');
+const previewBtn = $('#previewBtn');
+
+/* Anti-spam client limiter: allow one send per 5 seconds per session */
+let lastSentAt = 0;
+const SEND_COOLDOWN_MS = 5000;
+
+/* Auto textarea resize */
+function autoResize(el){
+  el.style.height = 'auto';
+  const newH = Math.min(window.innerHeight * 0.5, Math.max(140, el.scrollHeight));
+  el.style.height = newH + 'px';
+}
+textarea.addEventListener('input', () => {
+  const remaining = 300 - textarea.value.length;
   charCount.textContent = `${remaining} karakter tersisa`;
-  charCount.className = "char-count";
-  if (remaining <= 50 && remaining > 20) charCount.classList.add("warning");
-  if (remaining <= 20) charCount.classList.add("danger");
+  charCount.className = 'char-count' + (remaining<=20 ? ' danger' : (remaining<=50 ? ' warning' : ''));
+  previewText.textContent = textarea.value.trim() || 'Belum ada preview.';
+  autoResize(textarea);
 });
 
-// Kirim pesan
-btn.addEventListener("click", async () => {
-  const text = msgEl.value.trim();
-  if(!text) {
-    showStatus("Isi dulu pesannya 🙏", "error");
+/* Preview / demo / clear */
+demoFill.addEventListener('click', () => {
+  textarea.value = "Halo Nashri! Semoga harimu menyenangkan 💫";
+  textarea.dispatchEvent(new Event('input'));
+});
+clearBtn.addEventListener('click', () => {
+  textarea.value = '';
+  textarea.dispatchEvent(new Event('input'));
+});
+previewBtn.addEventListener('click', () => {
+  // show quick toast preview
+  showToast('Preview: ' + (textarea.value.trim().slice(0,140) || '[kosong]'), 'default', 2200);
+});
+
+/* Nice micro-interaction for button */
+sendBtn.addEventListener('pointerdown', (ev) => {
+  // create micro ripple
+  const b = ev.currentTarget;
+  const r = create('span');
+  r.style.position='absolute';
+  r.style.width='14px'; r.style.height='14px'; r.style.borderRadius='50%';
+  r.style.background='rgba(255,255,255,0.2)'; r.style.left='50%'; r.style.top='50%';
+  r.style.transform='translate(-50%,-50%) scale(.8)';
+  r.style.opacity='0.9'; r.style.pointerEvents='none';
+  r.style.transition='transform .45s ease, opacity .45s ease';
+  b.appendChild(r);
+  requestAnimationFrame(()=> {
+    r.style.transform='translate(-50%,-50%) scale(18)'; r.style.opacity='0';
+  });
+  setTimeout(()=> r.remove(), 450);
+});
+
+/* ===========================
+   Firebase operations (lazy loaded)
+   =========================== */
+let db = null; // will hold Database instance
+let firebaseApp = null;
+let initialized = false;
+
+async function initFirebaseIfNeeded(){
+  if(initialized) return true;
+  const cfg = await getFirebaseConfig();
+  if(!cfg){
+    // show clear instruction so user won't commit key
+    const msg = 'Firebase config not found. (Recommended: inject config.js at build or use Firebase Hosting to auto-init.)';
+    showToast(msg, 'error', 6000);
+    $('#status').textContent = msg;
+    $('#status').className = 'status error';
+    return false;
+  }
+
+  // dynamic import of SDK (already type="module" import allowed)
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js');
+    const { getDatabase } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js');
+    // initialize
+    firebaseApp = initializeApp(cfg);
+    db = getDatabase(firebaseApp);
+    initialized = true;
+    if(devModeToggle.checked) console.info('Firebase initialized with project:', cfg.projectId || cfg.databaseURL);
+    return true;
+  } catch(err){
+    showToast('Gagal inisialisasi Firebase: ' + err.message, 'error', 6000);
+    $('#status').textContent = 'Gagal inisialisasi Firebase: ' + err.message;
+    $('#status').className = 'status error';
+    return false;
+  }
+}
+
+/* send message logic (robust) */
+async function sendMessage(){
+  const now = Date.now();
+  if(now - lastSentAt < SEND_COOLDOWN_MS){
+    const wait = Math.ceil((SEND_COOLDOWN_MS - (now - lastSentAt))/1000);
+    showToast('Tunggu '+wait+' detik sebelum kirim lagi.', 'error', 1800);
     return;
   }
 
-  btn.disabled = true;
-  showStatus("Mengirim...", "sending");
+  const text = textarea.value.trim();
+  if(!text){
+    showToast('Isi pesan dulu bro!', 'error', 1200);
+    $('#status').textContent = 'Isi pesan dulu';
+    $('#status').className = 'status error';
+    return;
+  }
+  if(text.length > 300){
+    showToast('Pesan terlalu panjang (max 300).', 'error', 1600);
+    return;
+  }
+
+  // optimistic UI
+  sendBtn.disabled = true;
+  $('#status').textContent = 'Mengirim...';
+  $('#status').className = 'status sending';
+
+  // ensure firebase ready
+  const ok = await initFirebaseIfNeeded();
+  if(!ok){
+    sendBtn.disabled = false;
+    return;
+  }
 
   try {
-    await push(ref(db, "messages/nashri"), {
-      text,
+    const { push, ref } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js');
+    // write to messages/nashri
+    const nodeRef = ref(db, 'messages/nashri');
+    await push(nodeRef, {
+      text: text,
       timestamp: Date.now(),
-      ua: navigator.userAgent.slice(0,100)
+      ua: navigator.userAgent.slice(0,160)
     });
-
-    msgEl.value = "";
-    charCount.textContent = "300 karakter tersisa";
-    charCount.className = "char-count";
-
-    showStatus("✅ Pesan berhasil dikirim!", "success");
-  } catch(err) {
-    showStatus("❌ Gagal kirim: " + err.message, "error");
+    lastSentAt = Date.now();
+    showToast('Pesan terkirim ✅', 'success', 1800);
+    $('#status').textContent = 'Pesan terkirim';
+    $('#status').className = 'status success';
+    // clear and update preview
+    textarea.value = '';
+    textarea.dispatchEvent(new Event('input'));
+  } catch(err){
+    console.error('send error', err);
+    showToast('Gagal kirim: ' + (err && err.message ? err.message : 'unknown'), 'error', 4000);
+    $('#status').textContent = 'Gagal kirim: ' + (err && err.message ? err.message : '');
+    $('#status').className = 'status error';
   } finally {
-    btn.disabled = false;
+    sendBtn.disabled = false;
+  }
+}
+
+/* key handler: ctrl+enter or cmd+enter send */
+textarea.addEventListener('keydown', (e) => {
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    e.preventDefault();
+    sendMessage();
   }
 });
 
-// Fungsi status interaktif
-function showStatus(message, type) {
-  statusEl.textContent = message;
-  statusEl.className = "status " + type + " fade";
+/* attach send */
+sendBtn.addEventListener('click', sendMessage);
+
+/* dev toggle logs */
+devModeToggle.addEventListener('change', () => {
+  if(devModeToggle.checked) {
+    showToast('Dev mode aktif', 'default', 1200);
+  } else {
+    showToast('Dev mode nonaktif', 'default', 1200);
+  }
+});
+
+/* initial autosize and preview */
+autoResize(textarea);
+textarea.dispatchEvent(new Event('input'));
+
+/* Accessibility: focus first textarea for desktop */
+if(window.matchMedia('(min-width: 760px)').matches){
+  textarea.focus();
 }
+
+/* Debug: if repo detected a leaked API key, don't panic.
+   Action items (short):
+   - Rotate & restrict the key in Google Cloud Console
+   - Remove key from repo history (BFG / git filter-repo)
+   - Use runtime injection or Firebase Hosting init.json to avoid committing keys.
+*/
+
+/* ===========================
+   End of main script
+   =========================== */
+
 </script>
 
+<!-- Developer notes (DO NOT COMMIT SECRETS)
+  If you're deploying to GitHub Pages / Netlify / Vercel:
+  - Create a build step that injects a public-less config file "config.js" with:
+      window.__FIREBASE_CONFIG__ = { apiKey: "...", authDomain: "...", databaseURL: "...", projectId: "...", ... };
+    Do NOT commit that file to repo.
+  - Or use environment variables and CI to generate it at deploy time.
+
+  If deploying to Firebase Hosting, the SDK can auto-load config from:
+    /__/firebase/init.json
+  which is safe and not stored in repo.
+
+  For maximum security, after rotating key, restrict it to:
+   - Application restrictions: HTTP referrers (your domains + localhost)
+   - API restrictions: only Firebase-related APIs used by your app
+  ===================================================================== -->
 </body>
 </html>
