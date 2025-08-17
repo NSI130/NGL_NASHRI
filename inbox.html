@@ -7,45 +7,60 @@
 <style>
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(120deg, #f0f0f0, #e0e0e0);
+    background: linear-gradient(135deg, #222831, #393E46);
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
+    color: #EEEEEE;
   }
 
   .card {
-    background: #fff;
+    background: #222831;
     padding: 25px;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     width: 100%;
     max-width: 500px;
     text-align: center;
-    position: relative;
+    animation: slideDown 0.8s ease;
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   h1 {
-    margin-bottom: 15px;
-    color: #111;
+    margin-bottom: 20px;
+    color: #00ADB5;
   }
 
   input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 8px 0;
     border-radius: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #555;
     font-size: 16px;
+    background: #393E46;
+    color: #EEEEEE;
+    transition: all 0.3s ease;
+  }
+
+  input:focus {
+    border-color: #00ADB5;
+    outline: none;
+    box-shadow: 0 0 6px #00ADB5;
   }
 
   button {
-    padding: 10px 20px;
+    padding: 12px;
     border-radius: 12px;
     border: none;
-    background: #111;
+    background: #00ADB5;
     color: #fff;
     cursor: pointer;
     font-size: 16px;
@@ -54,42 +69,60 @@
     transition: all 0.3s ease;
   }
 
+  button:hover { background: #019aa2; }
   button:active { transform: scale(0.97); }
+
+  .link {
+    color: #00ADB5;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline-block;
+    margin-top: 5px;
+  }
 
   #status {
     font-size: 14px;
-    margin-bottom: 15px;
-    color: #555;
+    margin: 10px 0;
+    min-height: 20px;
   }
+
+  #status.success { color: #4CAF50; }
+  #status.error { color: #FF5252; }
 
   #messages {
     list-style: none;
     padding: 0;
     max-height: 400px;
     overflow-y: auto;
-    border-top: 1px solid #eee;
     text-align: left;
+    margin-top: 15px;
   }
 
   #messages li {
+    background: #393E46;
+    margin-bottom: 10px;
     padding: 12px;
-    border-bottom: 1px solid #eee;
-    transition: background 0.3s ease;
-    position: relative;
+    border-radius: 12px;
+    animation: fadeIn 0.5s ease;
   }
 
-  #messages li:hover { background: #f9f9f9; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   .timestamp {
     font-size: 11px;
-    color: #888;
+    color: #bbb;
     display: block;
-    margin-top: 5px;
+    margin-top: 6px;
   }
 
   .message-text {
     font-size: 15px;
     word-wrap: break-word;
+    color: #EEEEEE;
   }
 </style>
 </head>
@@ -101,6 +134,7 @@
     <input type="email" id="email" placeholder="Email admin">
     <input type="password" id="password" placeholder="Password">
     <button id="loginBtn">Login</button>
+    <div class="link" id="forgotPass">Lupa Password?</div>
   </div>
   <p id="status">Belum login</p>
   <ul id="messages"></ul>
@@ -109,9 +143,14 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  sendPasswordResetEmail 
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-// Config Firebase lo
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
   authDomain: "nashri-ngl.firebaseapp.com",
@@ -127,6 +166,7 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 
 const loginBtn = document.getElementById("loginBtn");
+const forgotPass = document.getElementById("forgotPass");
 const emailEl = document.getElementById("email");
 const passwordEl = document.getElementById("password");
 const statusEl = document.getElementById("status");
@@ -138,38 +178,59 @@ loginBtn.addEventListener("click", async () => {
   const email = emailEl.value.trim();
   const password = passwordEl.value.trim();
   if(!email || !password) {
-    statusEl.textContent = "Isi email & password bro!";
+    statusEl.textContent = "⚠️ Isi email & password!";
+    statusEl.className = "error";
     return;
   }
-  statusEl.textContent = "Login...";
+  statusEl.textContent = "⏳ Login...";
+  statusEl.className = "";
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch(err) {
-    statusEl.textContent = "Login gagal: " + err.message;
+    statusEl.textContent = "❌ Login gagal: " + err.message;
+    statusEl.className = "error";
   }
 });
 
-// Status login dan load pesan
+// Forgot password
+forgotPass.addEventListener("click", async () => {
+  const email = emailEl.value.trim();
+  if(!email) {
+    statusEl.textContent = "Masukkan email dulu buat reset 🔑";
+    statusEl.className = "error";
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    statusEl.textContent = "📧 Link reset dikirim ke " + email;
+    statusEl.className = "success";
+  } catch(err) {
+    statusEl.textContent = "❌ Error: " + err.message;
+    statusEl.className = "error";
+  }
+});
+
+// Status login
 onAuthStateChanged(auth, (user) => {
   if(user) {
-    statusEl.textContent = "Login sukses ✅";
+    statusEl.textContent = "✅ Login sukses!";
+    statusEl.className = "success";
     loginForm.style.display = "none";
     loadMessages();
   }
 });
 
-// Load pesan realtime, urut dari terbaru
+// Load pesan realtime
 function loadMessages() {
   const messagesRef = ref(db, "messages/nashri");
   onChildAdded(messagesRef, (snapshot) => {
     const data = snapshot.val();
+    if(!data) return;
     const li = document.createElement("li");
     const ts = new Date(data.timestamp).toLocaleString();
-    li.innerHTML = `<span class="message-text">${data.text}</span><span class="timestamp">${ts}</span>`;
+    li.innerHTML = `<span class="message-text">${data.text}</span>
+                    <span class="timestamp">${ts}</span>`;
     messagesList.prepend(li);
-    // Scroll otomatis ke atas
-    messagesList.scrollTop = 0;
-    statusEl.textContent = `✅ Pesan dimuat (total: ${messagesList.children.length})`;
   });
 }
 </script>
