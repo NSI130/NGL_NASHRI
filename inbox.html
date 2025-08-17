@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📩 Inbox Admin</title>
+<title>📩 Inbox Nashri</title>
 <style>
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -24,6 +24,7 @@
     width: 100%;
     max-width: 500px;
     text-align: center;
+    position: relative;
   }
 
   h1 {
@@ -71,9 +72,10 @@
   }
 
   #messages li {
-    padding: 10px;
+    padding: 12px;
     border-bottom: 1px solid #eee;
     transition: background 0.3s ease;
+    position: relative;
   }
 
   #messages li:hover { background: #f9f9f9; }
@@ -84,12 +86,17 @@
     display: block;
     margin-top: 5px;
   }
+
+  .message-text {
+    font-size: 15px;
+    word-wrap: break-word;
+  }
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>📩 Inbox Admin</h1>
+  <h1>📩 Inbox Nashri</h1>
   <div id="loginForm">
     <input type="email" id="email" placeholder="Email admin">
     <input type="password" id="password" placeholder="Password">
@@ -104,7 +111,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/fireba
 import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-// ====== GANTI INI DENGAN CONFIG ASLI LO ======
+// Config Firebase lo
 const firebaseConfig = {
   apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
   authDomain: "nashri-ngl.firebaseapp.com",
@@ -126,6 +133,7 @@ const statusEl = document.getElementById("status");
 const messagesList = document.getElementById("messages");
 const loginForm = document.getElementById("loginForm");
 
+// Login admin
 loginBtn.addEventListener("click", async () => {
   const email = emailEl.value.trim();
   const password = passwordEl.value.trim();
@@ -133,9 +141,7 @@ loginBtn.addEventListener("click", async () => {
     statusEl.textContent = "Isi email & password bro!";
     return;
   }
-
   statusEl.textContent = "Login...";
-
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch(err) {
@@ -143,6 +149,7 @@ loginBtn.addEventListener("click", async () => {
   }
 });
 
+// Status login dan load pesan
 onAuthStateChanged(auth, (user) => {
   if(user) {
     statusEl.textContent = "Login sukses ✅";
@@ -151,14 +158,18 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+// Load pesan realtime, urut dari terbaru
 function loadMessages() {
-  const messagesRef = ref(db, "messages/public");
+  const messagesRef = ref(db, "messages/nashri");
   onChildAdded(messagesRef, (snapshot) => {
     const data = snapshot.val();
     const li = document.createElement("li");
-    li.innerHTML = `${data.text}<span class="timestamp">${new Date(data.timestamp).toLocaleString()}</span>`;
+    const ts = new Date(data.timestamp).toLocaleString();
+    li.innerHTML = `<span class="message-text">${data.text}</span><span class="timestamp">${ts}</span>`;
     messagesList.prepend(li);
-    statusEl.textContent = "✅ Pesan dimuat";
+    // Scroll otomatis ke atas
+    messagesList.scrollTop = 0;
+    statusEl.textContent = `✅ Pesan dimuat (total: ${messagesList.children.length})`;
   });
 }
 </script>
