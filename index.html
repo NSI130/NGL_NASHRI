@@ -5,33 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💌 Kirim Pesan ke Nashri</title>
 <style>
+  /* Warna utama */
+  :root {
+    --dark: #222831;
+    --semi-dark: #393E46;
+    --accent: #00ADB5;
+    --light: #EEEEEE;
+  }
+
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg,#fdfbfb,#ebedee);
+    background: var(--dark);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 16px;
+    padding: 20px;
+    color: var(--light);
+    overflow-x: hidden;
   }
 
+  /* Card utama */
   .card {
-    background: #fff;
+    background: var(--semi-dark);
     padding: 30px 25px;
     border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-    max-width: 480px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    max-width: 500px;
     width: 100%;
     text-align: center;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
+    animation: fadeInUp 0.7s ease;
+  }
+
+  @keyframes fadeInUp {
+    from {opacity: 0; transform: translateY(30px);}
+    to {opacity: 1; transform: translateY(0);}
   }
 
   h1 {
     margin-bottom: 20px;
-    color: #111;
+    color: var(--accent);
+    font-size: 1.6rem;
+    font-weight: bold;
   }
 
   textarea {
@@ -39,37 +57,54 @@
     min-height: 120px;
     padding: 14px;
     border-radius: 12px;
-    border: 1px solid #ccc;
+    border: 2px solid transparent;
     resize: none;
     font-size: 16px;
     transition: all 0.3s ease;
+    background: var(--dark);
+    color: var(--light);
+  }
+
+  textarea::placeholder {
+    color: #aaa;
   }
 
   textarea:focus {
     outline: none;
-    border-color: #111;
-    box-shadow: 0 0 8px rgba(17,17,17,0.2);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,173,181,0.5);
   }
 
   .char-count {
     text-align: right;
-    font-size: 12px;
-    color: #666;
-    margin-top: 4px;
+    font-size: 13px;
+    color: #bbb;
+    margin-top: 6px;
+    transition: color 0.3s;
   }
 
+  .char-count.warning { color: orange; }
+  .char-count.danger { color: red; }
+
   button {
-    margin-top: 15px;
-    padding: 12px 25px;
+    margin-top: 20px;
+    padding: 14px 30px;
     border: none;
-    border-radius: 12px;
+    border-radius: 30px;
     cursor: pointer;
-    background: #111;
-    color: #fff;
+    background: var(--accent);
+    color: var(--light);
     font-size: 16px;
+    font-weight: bold;
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: #02c4ce;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,173,181,0.4);
   }
 
   button:disabled {
@@ -77,35 +112,48 @@
     cursor: not-allowed;
   }
 
+  /* Ripple animasi */
+  button::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255,255,255,0.5);
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    top: 50%;
+    pointer-events: none;
+    transition: transform 0.5s, opacity 1s;
+    transform: translate(-50%,-50%) scale(0);
+    opacity: 0;
+  }
+
+  button:active::after {
+    transform: translate(-50%,-50%) scale(2.5);
+    opacity: 1;
+    transition: 0s;
+  }
+
   .status {
-    margin-top: 12px;
+    margin-top: 15px;
     font-size: 14px;
-    color: #555;
-    min-height: 20px;
+    min-height: 22px;
     transition: all 0.3s ease;
   }
 
-  .status.success { color: green; }
-  .status.error { color: red; }
+  .status.success { color: #4CAF50; }
+  .status.error { color: #FF5252; }
+  .status.sending { color: var(--accent); }
 
-  button.ripple::after {
-    content: "";
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: rgba(255,255,255,0.3);
-    display: block;
-    border-radius: 50%;
-    transform: scale(0);
-    animation: ripple 0.6s linear;
-    pointer-events: none;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(0);
+  /* Animasi status */
+  .status.fade {
+    animation: fadeIn 0.5s ease;
   }
 
-  @keyframes ripple {
-    to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.9);}
+    to {opacity: 1; transform: scale(1);}
   }
 </style>
 </head>
@@ -115,7 +163,7 @@
   <h1>💌 Kirim Pesan buat Nashri</h1>
   <textarea id="message" maxlength="300" placeholder="Tulis pesanmu di sini..."></textarea>
   <div class="char-count" id="charCount">300 karakter tersisa</div>
-  <button id="sendBtn" class="ripple">Kirim</button>
+  <button id="sendBtn">🚀 Kirim</button>
   <div id="status" class="status"></div>
 </div>
 
@@ -123,7 +171,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-// Config Firebase lo
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
   authDomain: "nashri-ngl.firebaseapp.com",
@@ -142,24 +190,25 @@ const msgEl = document.getElementById("message");
 const statusEl = document.getElementById("status");
 const charCount = document.getElementById("charCount");
 
-// Hitungan karakter sisa
+// Hitungan karakter sisa + indikator warna
 msgEl.addEventListener("input", () => {
   const remaining = 300 - msgEl.value.length;
   charCount.textContent = `${remaining} karakter tersisa`;
+  charCount.className = "char-count";
+  if (remaining <= 50 && remaining > 20) charCount.classList.add("warning");
+  if (remaining <= 20) charCount.classList.add("danger");
 });
 
-// Kirim pesan ke folder Nashri
+// Kirim pesan
 btn.addEventListener("click", async () => {
   const text = msgEl.value.trim();
   if(!text) {
-    statusEl.textContent = "Isi dulu pesannya 🙏";
-    statusEl.className = "status error";
+    showStatus("Isi dulu pesannya 🙏", "error");
     return;
   }
 
   btn.disabled = true;
-  statusEl.textContent = "Mengirim...";
-  statusEl.className = "status";
+  showStatus("Mengirim...", "sending");
 
   try {
     await push(ref(db, "messages/nashri"), {
@@ -170,19 +219,21 @@ btn.addEventListener("click", async () => {
 
     msgEl.value = "";
     charCount.textContent = "300 karakter tersisa";
+    charCount.className = "char-count";
 
-    statusEl.textContent = "✅ Pesan berhasil dikirim ke Nashri!";
-    statusEl.className = "status success";
-
-    btn.classList.add("ripple");
-    setTimeout(() => btn.classList.remove("ripple"), 600);
+    showStatus("✅ Pesan berhasil dikirim!", "success");
   } catch(err) {
-    statusEl.textContent = "❌ Gagal kirim: " + err.message;
-    statusEl.className = "status error";
+    showStatus("❌ Gagal kirim: " + err.message, "error");
   } finally {
     btn.disabled = false;
   }
 });
+
+// Fungsi status interaktif
+function showStatus(message, type) {
+  statusEl.textContent = message;
+  statusEl.className = "status " + type + " fade";
+}
 </script>
 
 </body>
