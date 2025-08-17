@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inbox Pesan</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    h1 { text-align: center; }
+    .item { border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .time { font-size: 12px; color: #666; margin-top: 6px; }
+    .controls { display: flex; gap: 8px; margin: 12px 0; }
+    input, button { padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>📬 Inbox Pesan</h1>
+  <div class="controls">
+    <input id="username" placeholder="to= siapa? (misal: nashri)" />
+    <button id="load">Muat Pesan</button>
+  </div>
+  <div id="list"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyACHD-k_KBCboyllU6kzjKk_pkiJpaH1hk",
+      authDomain: "nashri-ngl.firebaseapp.com",
+      databaseURL: "https://nashri-ngl-default-rtdb.firebaseio.com",
+      projectId: "nashri-ngl",
+      storageBucket: "nashri-ngl.firebasestorage.app",
+      messagingSenderId: "73245598906",
+      appId: "1:73245598906:web:70b18cb9ccf9e54ff18e83",
+      measurementId: "G-FWSDBGGXGH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const list = document.getElementById("list");
+    const usernameInput = document.getElementById("username");
+    document.getElementById("load").addEventListener("click", () => {
+      const user = (usernameInput.value || "public").trim();
+      const q = query(ref(db, `messages/${user}`), orderByChild("timestamp"), limitToLast(200));
+
+      onValue(q, (snap) => {
+        const arr = [];
+        snap.forEach(child => {
+          arr.push(child.val());
+        });
+        arr.sort((a,b) => b.timestamp - a.timestamp); // terbaru dulu
+        list.innerHTML = "";
+        if (arr.length === 0) {
+          list.innerHTML = "<p>Belum ada pesan.</p>";
+          return;
+        }
+        for (const m of arr) {
+          const div = document.createElement("div");
+          const t = new Date(m.timestamp || Date.now());
+          div.className = "item";
+          div.innerHTML = `
+            <div>${(m.text || "").replaceAll("<","&lt;")}</div>
+            <div class="time">${t.toLocaleString()}</div>
+          `;
+          list.appendChild(div);
+        }
+      }, (err) => {
+        list.innerHTML = "<p>Gagal baca: " + err.message + "</p>";
+      });
+    });
+  </script>
+</body>
+</html>
